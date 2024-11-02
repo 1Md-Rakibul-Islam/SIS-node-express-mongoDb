@@ -28,8 +28,8 @@ export type Student = {
     email: string;
     contactNo: string;
     emergencyContactNo: string;
-    bloogGroup?: 'A+' | 'A-' | 'B+' | 'B-' | 'AB+' | 'AB-' | 'O+' | 'O-';
-    presentAddress: string;
+    bloodGroup: 'A+' | 'A-' | 'B+' | 'B-' | 'AB+' | 'AB-' | 'O+' | 'O-';
+    presentAddres: string;
     permanentAddres: string;
     guardian: Guardian;
     localGuardian: LocalGuardian;
