@@ -117,8 +117,8 @@ const studentSchema = new Schema<Student>({
         },
         required: [true, 'Blood group is required'],
     },
-    presentAddres: { type: String, required: [true, 'Present address is required'] },
-    permanentAddres: { type: String, required: [true, 'Permanent address is required'] },
+    presentAddress: { type: String, required: [true, 'Present address is required'] },
+    permanentAddress: { type: String, required: [true, 'Permanent address is required'] },
     guardian: guardianSchema,
     localGuardian: {
         type: localGuardianSchema,
