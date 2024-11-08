@@ -10,6 +10,8 @@ import {
     TStudent,
     TUserName,
 } from './student/student.interface';
+import bcrypt from 'bcrypt';
+import config from '../config';
 // import validator from 'validator';
 
 const userNameSchema = new Schema<TUserName>({
@@ -92,6 +94,10 @@ const localGuardianSchema = new Schema<TLocalGuardian>({
 
 const studentSchema = new Schema<TStudent, StudentModel>({
     id: { type: String, required: [true, 'Student ID is required'], unique: true },
+    password: {
+        type: String, required: [true, 'Password is required'], unique: true,
+        maxlength: [20, 'Password cannot be more than 20 characters'],
+    },
     name: {
         type: userNameSchema,
         required: [true, 'Student name is required'],
@@ -142,6 +148,25 @@ const studentSchema = new Schema<TStudent, StudentModel>({
         required: [true, 'Status is required'],
     },
 });
+
+// create middleware
+// pre save middleware / hook 
+studentSchema.pre("save", async function (next) {
+    // eslint-disable-next-line @typescript-eslint/no-this-alias
+    const user = this;
+
+    user.password = await bcrypt.hash(user.password, Number(config.bcrypt_salt_rounds));
+
+    next();
+});
+
+// post save middleware / hook 
+studentSchema.post("save", function () {
+    console.log(this, 'student post save hook');
+});
+
+
+
 
 // create a custom static method
 studentSchema.statics.isUserExists = async function (id: string) {
