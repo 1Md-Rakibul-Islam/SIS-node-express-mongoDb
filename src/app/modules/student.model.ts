@@ -93,7 +93,7 @@ const localGuardianSchema = new Schema<TLocalGuardian>({
 // StudentMethods for user define instance methods
 
 const studentSchema = new Schema<TStudent, StudentModel>({
-    id: { type: String, required: [true, 'Student ID is required'], unique: true },
+    id: { type: String, required: [true, 'Student ID is required'] },
     password: {
         type: String, required: [true, 'Password is required'], unique: true,
         maxlength: [20, 'Password cannot be more than 20 characters'],
@@ -147,9 +147,22 @@ const studentSchema = new Schema<TStudent, StudentModel>({
         default: 'active',
         required: [true, 'Status is required'],
     },
+    isDeleted: { type: Boolean, default: false },
+}, {
+    toJSON: {
+        virtuals: true,
+    }
 });
 
 // create middleware
+
+// mongoose virtual properties
+studentSchema.virtual("fullName").get(function () {
+    return (
+        `${this.name.firstName} ${this.name.middleName} ${this.name.lastName}`
+    )
+});
+
 // pre save middleware / hook 
 studentSchema.pre("save", async function (next) {
     // eslint-disable-next-line @typescript-eslint/no-this-alias
@@ -161,9 +174,28 @@ studentSchema.pre("save", async function (next) {
 });
 
 // post save middleware / hook 
-studentSchema.post("save", function () {
-    console.log(this, 'student post save hook');
+studentSchema.post("save", function (doc, next) {
+    doc.password = "";
+    next();
 });
+
+// query middleware / hook
+studentSchema.pre("find", async function (next) {
+    this.find({ isDeleted: { $ne: true } });
+    next();
+})
+
+studentSchema.pre("findOne", async function (next) {
+    this.find({ isDeleted: { $ne: true } });
+    next();
+})
+
+// with aggregate
+studentSchema.pre("aggregate", function (next) {
+    this.pipeline().unshift({ $match: { isDeleted: { $ne: true } } });
+    next();
+});
+
 
 
 
